@@ -6,4 +6,64 @@
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
     <color name="colorAccent">#81C784</color>
+    <color name="chartForefround">#E53935</color>
+    <color name="chartBackground">#3F51B5</color>
+    <color name="chartOverflow">#000000</color>
+
+    <color name="Red5">#F44336</color>
+    <color name="Purple5">#9C27B0</color>
+    <color name="Indigo5">#3F51B5</color>
+    <color name="Blue5">#2196F3</color>
+    <color name="Teal5">#009688</color>
+    <color name="LightBlue5">#03A9F4</color>
+    <color name="Cyan5">#00BCD4</color>
+    <color name="Green5">#4CAF50</color>
+    <color name="Lime5">#CDDC39</color>
+    <color name="Amber5">#FFC107</color>
+    <color name="Orange5">#FF9800</color>
+    <color name="DeepOrange5">#FF5722</color>
+
+    <color name="Red7">#D32F2F</color>
+    <color name="Purple7">#7B1FA2</color>
+    <color name="Indigo7">#303F9F</color>
+    <color name="Blue7">#1976D2</color>
+    <color name="Teal7">#00796B</color>
+    <color name="LightBlue7">#0288D1</color>
+    <color name="Cyan7">#0097A7</color>
+    <color name="Green7">#388E3C</color>
+    <color name="Lime7">#AFB42B</color>
+    <color name="Amber7">#FFA000</color>
+    <color name="Orange7">#F57C00</color>
+    <color name="DeepOrange7">#E64A19</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+
+    <array name="barChartColors">
+        <item>@color/Red5</item>
+        <item>@color/Blue5</item>
+        <item>@color/Cyan5</item>
+        <item>@color/Amber5</item>
+        <item>@color/Teal5</item>
+        <item>@color/Orange5</item>
+        <item>@color/Green5</item>
+        <item>@color/DeepOrange5</item>
+        <item>@color/Lime5</item>
+        <item>@color/Indigo5</item>
+        <item>@color/LightBlue5</item>
+        <item>@color/Purple5</item>
+        <item>@color/Red7</item>
+        <item>@color/Blue7</item>
+        <item>@color/Cyan7</item>
+        <item>@color/Amber7</item>
+        <item>@color/Teal7</item>
+        <item>@color/Orange7</item>
+        <item>@color/Green7</item>
+        <item>@color/DeepOrange7</item>
+        <item>@color/Lime7</item>
+        <item>@color/Indigo7</item>
+        <item>@color/LightBlue7</item>
+        <item>@color/Purple7</item>
+    </array>
 </resources>
