@@ -92,5 +92,39 @@
             android:layout_marginTop="10dp"
             android:id="@+id/all_income_table"></TableLayout>
 
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/all_income_table"
+            android:id="@+id/all_month_expense_table_title"
+            android:textSize="30dp"
+            android:text="All Monthly Expenses"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"/>
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/all_month_expense_table_title"
+            android:layout_marginTop="10dp"
+            android:id="@+id/all_month_expense_table"></TableLayout>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/all_month_expense_table"
+            android:id="@+id/all_month_income_table_title"
+            android:textSize="30dp"
+            android:text="All Incomes"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"/>
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/all_month_income_table_title"
+            android:layout_marginTop="10dp"
+            android:id="@+id/all_month_income_table"></TableLayout>
+
     </RelativeLayout>
 </ScrollView>

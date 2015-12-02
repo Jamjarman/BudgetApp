@@ -46,6 +46,8 @@ public class AllTime extends Fragment {
     private PieChartDrawer pieChart;
     private TableLayout expenseTable;
     private TableLayout incomeTable;
+    private TableLayout monthExpenseTable;
+    private TableLayout monthIncomeTable;
 
     public AllTime() {
         // Required empty public constructor
@@ -66,6 +68,8 @@ public class AllTime extends Fragment {
         pieChart=(PieChartDrawer)rootView.findViewById(R.id.all_pie_chart);
         expenseTable=(TableLayout)rootView.findViewById(R.id.all_expense_table);
         incomeTable=(TableLayout)rootView.findViewById(R.id.all_income_table);
+        monthExpenseTable=(TableLayout)rootView.findViewById(R.id.all_month_expense_table);
+        monthIncomeTable=(TableLayout)rootView.findViewById(R.id.all_month_income_table);
         TableRow income_head=new TableRow(getActivity());
         int i=-9;
         income_head.setId(i + 10);
@@ -125,6 +129,53 @@ public class AllTime extends Fragment {
         expense_head.addView(descHead2);
         expenseTable.addView(expense_head);
         incomeTable.addView(income_head);
+        TableRow income_head_month=new TableRow(getActivity());
+        int j=9;
+        income_head.setId(i + 10);
+        income_head.setLayoutParams(new TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        TableRow expense_head_month=new TableRow(getActivity());
+        expense_head.setId(i + 20);
+        expense_head.setLayoutParams(new TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        TextView catHead3=new TextView(getActivity());
+        catHead3.setText("Category");
+        catHead3.setId(i + 12);
+        catHead3.setTextSize(20);
+        catHead3.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+        TextView catHead4=new TextView(getActivity());
+        catHead4.setText("Category");
+        catHead4.setId(i + 22);
+        catHead4.setTextSize(20);
+        catHead4.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+        income_head_month.addView(catHead3);
+        expense_head_month.addView(catHead4);
+        TextView amountHead3=new TextView(getActivity());
+        amountHead3.setText("Amount");
+        amountHead3.setTextSize(20);
+        amountHead3.setId(i + 14);
+        amountHead3.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+        TextView amountHead4=new TextView(getActivity());
+        amountHead4.setText("Amount");
+        amountHead4.setId(i + 24);
+        amountHead4.setTextSize(20);
+        amountHead4.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+        income_head_month.addView(amountHead3);
+        expense_head_month.addView(amountHead4);
+        TextView descHead3=new TextView(getActivity());
+        descHead3.setText("Description");
+        descHead3.setId(i + 13);
+        descHead3.setTextSize(20);
+        descHead3.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+        TextView descHead4=new TextView(getActivity());
+        descHead4.setText("Description");
+        descHead4.setId(i + 23);
+        descHead4.setTextSize(20);
+        descHead4.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+        income_head_month.addView(descHead3);
+        expense_head_month.addView(descHead4);
+        monthExpenseTable.addView(expense_head_month);
+        monthIncomeTable.addView(income_head_month);
         moneyForm=new DecimalFormat("#.##");
         new APICall().execute("http://jamieg.duckdns.org/budgetAPI/getIncomes.php?username=jamie&pass=password");
         new APICall().execute("http://jamieg.duckdns.org/budgetAPI/getExpenses.php?username=jamie&pass=password");
@@ -191,6 +242,36 @@ public class AllTime extends Fragment {
             for(int j=0; j<monthlyIncomeArr.length(); j++){
                 temp=monthlyIncomeArr.getJSONObject(j);
                 monthIncomeTotal+=temp.getDouble("amount");
+                TableRow tr=new TableRow(getActivity());
+                tr.setId(j + 1100);
+                tr.setLayoutParams(new TableLayout.LayoutParams(
+                        TableLayout.LayoutParams.MATCH_PARENT,
+                        TableLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+                TextView tcat=new TextView(getActivity());
+                tcat.setId(j + 1300);
+                tcat.setTextSize(10);
+                tcat.setLayoutParams(new TableRow.LayoutParams(
+                        TableRow.LayoutParams.MATCH_PARENT,
+                        TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+                tcat.setText(temp.getString("category"));
+                tr.addView(tcat);
+                TextView tamount=new TextView(getActivity());
+                tamount.setId(j + 1400);
+                tamount.setTextSize(10);
+                tamount.setLayoutParams(new TableRow.LayoutParams(
+                        TableRow.LayoutParams.MATCH_PARENT,
+                        TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+                tamount.setText("$" + temp.getDouble("amount"));
+                tr.addView(tamount);
+                TextView tdesc=new TextView(getActivity());
+                tdesc.setId(j+1500);
+                tdesc.setTextSize(10);
+                tdesc.setLayoutParams(new TableRow.LayoutParams(
+                        TableRow.LayoutParams.MATCH_PARENT,
+                        TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+                tdesc.setText(temp.getString("description"));
+                tr.addView(tdesc);
+                monthIncomeTable.addView(tr);
             }
             for(int k=0; k<expenseArr.length(); k++){
                 temp=expenseArr.getJSONObject(k);
@@ -245,6 +326,36 @@ public class AllTime extends Fragment {
             for(int l=0; l<monthlyExpenseArr.length(); l++){
                 temp=monthlyExpenseArr.getJSONObject(l);
                 monthIncomeTotal-=temp.getDouble("amount");
+                TableRow tr=new TableRow(getActivity());
+                tr.setId(l+2100);
+                tr.setLayoutParams(new TableLayout.LayoutParams(
+                        TableLayout.LayoutParams.MATCH_PARENT,
+                        TableLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+                TextView tcat=new TextView(getActivity());
+                tcat.setId(l + 2300);
+                tcat.setTextSize(10);
+                tcat.setLayoutParams(new TableRow.LayoutParams(
+                        TableRow.LayoutParams.MATCH_PARENT,
+                        TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+                tcat.setText(temp.getString("category"));
+                tr.addView(tcat);
+                TextView tamount=new TextView(getActivity());
+                tamount.setId(l + 2400);
+                tamount.setTextSize(10);
+                tamount.setLayoutParams(new TableRow.LayoutParams(
+                        TableRow.LayoutParams.MATCH_PARENT,
+                        TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+                tamount.setText("$" + temp.getDouble("amount"));
+                tr.addView(tamount);
+                TextView tdesc=new TextView(getActivity());
+                tdesc.setId(l+2500);
+                tdesc.setTextSize(10);
+                tdesc.setLayoutParams(new TableRow.LayoutParams(
+                        TableRow.LayoutParams.MATCH_PARENT,
+                        TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+                tdesc.setText(temp.getString("description"));
+                tr.addView(tdesc);
+                monthExpenseTable.addView(tr);
             }
             for(String key:expenseMap.keySet()){
                 Log.d("checkMap", "Key: "+key+" Value: "+expenseMap.get(key));
