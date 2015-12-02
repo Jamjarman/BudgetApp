@@ -33,6 +33,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
+/**
+ * class to support display of weekly income/expense data
+ */
 public class WeekFragment extends Fragment {
 
     private TextView outputText;
@@ -58,6 +61,9 @@ public class WeekFragment extends Fragment {
     }
 
     @Override
+    /*
+    Generate needed output widgets, set up table headers, make api calls
+     */
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_week, container, false);
@@ -66,6 +72,7 @@ public class WeekFragment extends Fragment {
         pieChart=(PieChartDrawer)rootView.findViewById(R.id.week_pie_chart);
         expenseTable=(TableLayout)rootView.findViewById(R.id.week_expense_table);
         incomeTable=(TableLayout)rootView.findViewById(R.id.week_income_table);
+        //TODO convert this gross shit to xml
         TableRow income_head=new TableRow(getActivity());
         int i=-9;
         income_head.setId(i + 10);
@@ -125,16 +132,17 @@ public class WeekFragment extends Fragment {
         expense_head.addView(descHead2);
         expenseTable.addView(expense_head);
         incomeTable.addView(income_head);
+        //create date format and gets date for today and beginning of week for api calls
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         Calendar cal=Calendar.getInstance();
         int dayOfWeek=cal.get(Calendar.DAY_OF_WEEK)-1;
         cal.add(cal.DAY_OF_YEAR, -1 * dayOfWeek);
-        Log.d("Day of week", ""+dayOfWeek);
+        //Log.d("Day of week", ""+dayOfWeek);
         Date dateTo=new Date();
         Date dateFrom = cal.getTime();
-
+        //makes calls to api including date for this week
         moneyForm=new DecimalFormat("#.##");
-        Log.d("Call", "http://jamieg.duckdns.org/budgetAPI/getExpenses.php?username=jamie&pass=password&dateFrom="+dateFormat.format(dateFrom)+"&dateTo="+dateFormat.format(dateTo));
+        //Log.d("Call", "http://jamieg.duckdns.org/budgetAPI/getExpenses.php?username=jamie&pass=password&dateFrom="+dateFormat.format(dateFrom)+"&dateTo="+dateFormat.format(dateTo));
         new APICall().execute("http://jamieg.duckdns.org/budgetAPI/getIncomes.php?username=jamie&pass=password&dateFrom="+dateFormat.format(dateFrom)+"&dateTo="+dateFormat.format(dateTo));
         new APICall().execute("http://jamieg.duckdns.org/budgetAPI/getExpenses.php?username=jamie&pass=password&dateFrom="+dateFormat.format(dateFrom)+"&dateTo="+dateFormat.format(dateTo));
         new APICall().execute("http://jamieg.duckdns.org/budgetAPI/getMonthlyExpenses.php?username=jamie&pass=password");
@@ -143,6 +151,12 @@ public class WeekFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * iterates through all received data, once it's been called and all api calls are processed. Converts this data to JSON objects and then does the following:
+     * Create a map of expenses to be used to create a pie chart
+     * Load data for each table into the display tables
+     * Calculate total expenses/incomes
+     */
     private void displayData(){
         try{
             JSONArray incomeArr= incomes.getJSONArray("rows");
@@ -255,16 +269,13 @@ public class WeekFragment extends Fragment {
                 temp=monthlyExpenseArr.getJSONObject(l);
                 monthIncomeTotal-=temp.getDouble("amount");
             }
-            for(String key:expenseMap.keySet()){
-                Log.d("checkMap", "Key: "+key+" Value: "+expenseMap.get(key));
-            }
-            Log.d("displayDataPre", "About to calc percent and display data");
+            //cretes data visualization objects
             double percent=expenseTotal/(incomeTotal+(monthIncomeTotal)/30*7);
             barChart.setPercent(percent);
             barChart.invalidate();
             pieChart.setValueMap(expenseMap);
             pieChart.invalidate();
-            Log.d("displayDataPost", "Percent has been added to pieChart");
+            //Log.d("displayDataPost", "Percent has been added to pieChart");
             String output="You have spent $"+moneyForm.format(expenseTotal)+" this week out of $"+moneyForm.format(incomeTotal+monthIncomeTotal/30*7)+" which is "+moneyForm.format(percent*100)+"% of this week's income";
             outputText.setText(output);
 
@@ -276,6 +287,10 @@ public class WeekFragment extends Fragment {
 
     }
 
+    /*
+   Gets data from async call, gets the proper table based on the value of the "table" element in the JSON array and sets the proper JSON obj to the received JSON array,
+    if all arrays are full then call display data
+    */
     public void handleResponse(String data){
         try{
             JSONObject jsonObj=new JSONObject(data);
@@ -313,8 +328,16 @@ public class WeekFragment extends Fragment {
         super.onDetach();
     }
 
+    /*
+    Interior class extending AsyncTask, used for aysnchronus calls to the api
+     */
     class APICall extends AsyncTask<String, String, String> {
 
+        /**
+         * call url and return response
+         * @param urlToGo
+         * @return
+         */
         protected String doInBackground(String... urlToGo){
             String response=null;
             HttpURLConnection conn=null;
@@ -348,6 +371,11 @@ public class WeekFragment extends Fragment {
             }
             return response;
         }
+
+        /**
+         * pass respose from http get call to handleResponse in super class
+         * @param response
+         */
         protected void onPostExecute(String response){
             handleResponse(response);
         }

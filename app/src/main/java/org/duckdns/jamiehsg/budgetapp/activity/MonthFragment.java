@@ -57,6 +57,9 @@ public class MonthFragment extends Fragment {
     }
 
     @Override
+    /*
+    Generate needed output widgets, set up table headers, make api calls
+     */
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_month, container, false);
@@ -142,6 +145,12 @@ public class MonthFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * iterates through all received data, once it's been called and all api calls are processed. Converts this data to JSON objects and then does the following:
+     * Create a map of expenses to be used to create a pie chart
+     * Load data for each table into the display tables
+     * Calculate total expenses/incomes
+     */
     private void displayData(){
         try{
             JSONArray incomeArr= incomes.getJSONArray("rows");
@@ -272,6 +281,10 @@ public class MonthFragment extends Fragment {
 
     }
 
+    /*
+   Gets data from async call, gets the proper table based on the value of the "table" element in the JSON array and sets the proper JSON obj to the received JSON array,
+    if all arrays are full then call display data
+    */
     public void handleResponse(String data){
         try{
             JSONObject jsonObj=new JSONObject(data);
@@ -309,8 +322,16 @@ public class MonthFragment extends Fragment {
         super.onDetach();
     }
 
+    /*
+    Interior class extending AsyncTask, used for aysnchronus calls to the api
+     */
     class APICall extends AsyncTask<String, String, String> {
 
+        /**
+         * call url and return response
+         * @param urlToGo
+         * @return
+         */
         protected String doInBackground(String... urlToGo){
             String response=null;
             HttpURLConnection conn=null;
@@ -344,6 +365,11 @@ public class MonthFragment extends Fragment {
             }
             return response;
         }
+
+        /**
+         * pass respose from http get call to handleResponse in super class
+         * @param response
+         */
         protected void onPostExecute(String response){
             handleResponse(response);
         }

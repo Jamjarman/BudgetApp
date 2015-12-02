@@ -33,6 +33,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
+/*
+A fragment designed to show all time spending records, also displays monthly incomes/expenses. Useful for long term spending analysis
+ */
 public class AllTime extends Fragment {
 
     private TextView outputText;
@@ -60,6 +63,9 @@ public class AllTime extends Fragment {
     }
 
     @Override
+    /*
+    Generate needed output widgets, set up table headers, make api calls
+     */
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_all_time, container, false);
@@ -71,6 +77,7 @@ public class AllTime extends Fragment {
         monthExpenseTable=(TableLayout)rootView.findViewById(R.id.all_month_expense_table);
         monthIncomeTable=(TableLayout)rootView.findViewById(R.id.all_month_income_table);
         TableRow income_head=new TableRow(getActivity());
+        //the following code is gross and is used to create headers for all 4 needed tables. TODO, convert this to xml or a seperate class so it's less gross
         int i=-9;
         income_head.setId(i + 10);
         income_head.setLayoutParams(new TableLayout.LayoutParams(
@@ -176,7 +183,9 @@ public class AllTime extends Fragment {
         expense_head_month.addView(descHead4);
         monthExpenseTable.addView(expense_head_month);
         monthIncomeTable.addView(income_head_month);
+        //create a format for money to be used later
         moneyForm=new DecimalFormat("#.##");
+        //Make api calls to each needed page TODO encrypt password to limit exposure, possibly just use a hash
         new APICall().execute("http://jamieg.duckdns.org/budgetAPI/getIncomes.php?username=jamie&pass=password");
         new APICall().execute("http://jamieg.duckdns.org/budgetAPI/getExpenses.php?username=jamie&pass=password");
         new APICall().execute("http://jamieg.duckdns.org/budgetAPI/getMonthlyExpenses.php?username=jamie&pass=password");
@@ -185,8 +194,15 @@ public class AllTime extends Fragment {
         return rootView;
     }
 
+    /**
+     * iterates through all received data, once it's been called and all api calls are processed. Converts this data to JSON objects and then does the following:
+     * Create a map of expenses to be used to create a pie chart
+     * Load data for each table into the display tables
+     * Calculate total expenses/incomes
+     */
     private void displayData(){
         try{
+            //Gets JSONArray's for each data entry
             JSONArray incomeArr= incomes.getJSONArray("rows");
             JSONArray expenseArr=expenses.getJSONArray("rows");
             JSONArray monthlyExpenseArr=monthlyExpenses.getJSONArray("rows");
@@ -197,6 +213,7 @@ public class AllTime extends Fragment {
             double monthIncomeTotal=0;
             double monthExpenseTotal=0;
             Map<String, Double> expenseMap=new TreeMap<String, Double>();
+            //iterates through all income data, adds amount to incomeTotal, loads data into incomeTable
             for(int i=0; i<incomeArr.length(); i++){
                 temp=incomeArr.getJSONObject(i);
                 incomeTotal+=temp.getDouble("amount");
@@ -239,6 +256,7 @@ public class AllTime extends Fragment {
                 tr.addView(tdesc);
                 incomeTable.addView(tr);
             }
+            //iterates through monthly Income data, adds amount to monthIncomeTotal, adds data to monthIncomeTable
             for(int j=0; j<monthlyIncomeArr.length(); j++){
                 temp=monthlyIncomeArr.getJSONObject(j);
                 monthIncomeTotal+=temp.getDouble("amount");
@@ -273,6 +291,7 @@ public class AllTime extends Fragment {
                 tr.addView(tdesc);
                 monthIncomeTable.addView(tr);
             }
+            //iterates through all expense data, adds amount to expense total, adds data to expenseTable, adds data to expenseMap
             for(int k=0; k<expenseArr.length(); k++){
                 temp=expenseArr.getJSONObject(k);
                 expenseTotal+=temp.getDouble("amount");
@@ -323,6 +342,7 @@ public class AllTime extends Fragment {
                 tr.addView(tdesc);
                 expenseTable.addView(tr);
             }
+            //iterates through monthlyExpense data, subtracts amount from monthly income, adds data to monthExpenseTable
             for(int l=0; l<monthlyExpenseArr.length(); l++){
                 temp=monthlyExpenseArr.getJSONObject(l);
                 monthIncomeTotal-=temp.getDouble("amount");
@@ -357,17 +377,18 @@ public class AllTime extends Fragment {
                 tr.addView(tdesc);
                 monthExpenseTable.addView(tr);
             }
-            for(String key:expenseMap.keySet()){
-                Log.d("checkMap", "Key: "+key+" Value: "+expenseMap.get(key));
-            }
-            Log.d("displayDataPre", "About to calc percent and display data");
-            double percent=expenseTotal/(incomeTotal+(monthIncomeTotal)/30*7);
+            //Log.d("displayDataPre", "About to calc percent and display data"); used for testing
+            //calculates a percentage of total icnome spent ignores monthly income TODO include monthly income multiplied by number of months of data available
+            double percent=expenseTotal/(incomeTotal);
+            //passses percent to barChart to create data visualization
             barChart.setPercent(percent);
             barChart.invalidate();
+            //passes expenseMap to pie chart to create data visualization
             pieChart.setValueMap(expenseMap);
             pieChart.invalidate();
-            Log.d("displayDataPost", "Percent has been added to pieChart");
-            String output="You have spent $"+moneyForm.format(expenseTotal)+" this week out of $"+moneyForm.format(incomeTotal+monthIncomeTotal/30*7)+" which is "+moneyForm.format(percent*100)+"% of this week's income";
+            //Log.d("displayDataPost", "Percent has been added to pieChart"); used for testing
+            //outputs percent and amounts as text
+            String output="You have spent $"+moneyForm.format(expenseTotal)+" out of $"+moneyForm.format(incomeTotal+monthIncomeTotal)+" which is "+moneyForm.format(percent*100)+"% of your total income";
             outputText.setText(output);
 
 
@@ -378,6 +399,10 @@ public class AllTime extends Fragment {
 
     }
 
+    /*
+    Gets data from async call, gets the proper table based on the value of the "table" element in the JSON array and sets the proper JSON obj to the received JSON array,
+     if all arrays are full then call display data
+     */
     public void handleResponse(String data){
         try{
             JSONObject jsonObj=new JSONObject(data);
@@ -415,8 +440,16 @@ public class AllTime extends Fragment {
         super.onDetach();
     }
 
+    /*
+    Interior class extending AsyncTask, used for aysnchronus calls to the api
+     */
     class APICall extends AsyncTask<String, String, String> {
 
+        /**
+         * call url and return response
+         * @param urlToGo
+         * @return
+         */
         protected String doInBackground(String... urlToGo){
             String response=null;
             HttpURLConnection conn=null;
@@ -450,6 +483,11 @@ public class AllTime extends Fragment {
             }
             return response;
         }
+
+        /**
+         * pass respose from http get call to handleResponse in super class
+         * @param response
+         */
         protected void onPostExecute(String response){
             handleResponse(response);
         }

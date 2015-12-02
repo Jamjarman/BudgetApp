@@ -37,6 +37,7 @@ public class BarPercentViewer extends View {
         init();
     }
 
+    //INITIALIZe paints for income color, expense color, and text labels
     private void init(){
         bgPaint=new Paint();
         bgPaint.setColor(getContext().getResources().getColor(R.color.chartBackground));
@@ -53,14 +54,26 @@ public class BarPercentViewer extends View {
         blackPaint.setTextSize(25);
     }
 
+    /**
+     * set percent
+     * @param per
+     */
     public void setPercent(double per){
             this.percent=per;
     }
 
+    /**
+     * get percent
+     * @return
+     */
     public double getPercent(){
         return this.percent;
     }
 
+    /**
+     * Draw two rectangles, the larger of which fills the given width, the other as a percent of the larger rectangle based on double per
+     * @param c
+     */
     protected void onDraw(Canvas c){
         super.onDraw(c);
         int h=getHeight()-40;

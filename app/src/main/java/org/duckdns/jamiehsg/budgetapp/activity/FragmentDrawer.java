@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Class to support creation of material design nav drawer
+ */
 public class FragmentDrawer extends Fragment {
 
     private static String TAG = FragmentDrawer.class.getSimpleName();
