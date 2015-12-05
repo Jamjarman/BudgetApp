@@ -1,0 +1,83 @@
+<resources>
+    <string name="app_name">BudgetApp</string>
+    <string name="action_settings">Settings</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="nav_item_plan">Plan Next Month</string>
+    <string name="nav_item_add_month_expense">Add Monthly Expense</string>
+    <string name="nav_item_add_month_income">Add Monthly Income</string>
+    <string name="nav_item_add_purchase">Add Purchase</string>
+    <string name="nav_item_add_income">Add Income</string>
+    <string name="nav_item_view_day">View Daily Performance</string>
+    <string name="nav_item_view_week">View Weeks Performance</string>
+    <string name="nav_item_view_month">View Months Performance</string>
+    <string name="nav_item_view_all">View All Time Performance</string>
+    <string name="nav_item_settings">Settings</string>
+    <string-array name="nav_drawer_labels">
+        <item>@string/nav_item_plan</item>
+        <item>@string/nav_item_add_month_income</item>
+        <item>@string/nav_item_add_month_expense</item>
+        <item>@string/nav_item_add_income</item>
+        <item>@string/nav_item_add_purchase</item>
+        <item>@string/nav_item_view_day</item>
+        <item>@string/nav_item_view_week</item>
+        <item>@string/nav_item_view_month</item>
+        <item>@string/nav_item_view_all</item>
+        <item>@string/nav_item_settings</item>
+    </string-array>
+    <string name="title_home">Home</string>
+    <string name="title_plan">Create a Plan</string>
+    <string name="title_month_expense">Add a Monthly Expense</string>
+    <string name="title_month_income">Add a Monthly Income</string>
+    <string name="title_purchase">Add a purchase</string>
+    <string name="title_income">Add a One Time Income</string>
+    <string name="title_day">Today\'s Performance</string>
+    <string name="title_week">This Week\'s Performance</string>
+    <string name="title_month">This Month\'s Performance</string>
+    <string name="title_all">All Time Performance</string>
+    <string name="title_settings">Settings</string>
+
+    <string name="plan_amount_instruct">Amount: </string>
+    <string name="plan_details_instruct">Reason: </string>
+    <string name="categories_instruct">Category: </string>
+
+    <string-array name="categories_expenses">
+        <item>Rent/Mortgage</item>
+        <item>Home Insurance</item>
+        <item>Home Maintenance</item>
+        <item>Food</item>
+        <item>Electric/Gas/Water</item>
+        <item>Internet/Phone</item>
+        <item>Car Payment</item>
+        <item>Car Insurance</item>
+        <item>Gas/Parking</item>
+        <item>Car Maintenance</item>
+        <item>Next Car</item>
+        <item>Outings</item>
+        <item>Vacation Fund</item>
+        <item>Electronics</item>
+        <item>Games</item>
+        <item>Misc. Entertainment</item>
+        <item>Snacks</item>
+        <item>Health Insurance</item>
+        <item>Life Insurance</item>
+        <item>Student Loans</item>
+        <item>Credit Card Loans</item>
+        <item>Other Loans</item>
+        <item>Charity</item>
+        <item>Savings</item>
+        <item>Emergency Fund</item>
+    </string-array>
+
+    <string-array name="categories_incomes">
+        <item>Salary</item>
+        <item>Bonus</item>
+        <item>Dividends</item>
+        <item>Interest</item>
+        <item>Gifts</item>
+        <item>Other</item>
+    </string-array>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

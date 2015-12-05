@@ -69,11 +69,14 @@ public class PieChartDrawer extends View {
     }
 
     //returns teh sum total of all amounts in given map
-    private int sumAmounts(Map<String, Double> m){
-        int ret=0;
+    private double sumAmounts(Map<String, Double> m){
+        double ret=0;
         for(String key:m.keySet()){
             ret+=m.get(key);
+            Log.d("value", m.get(key)+"");
+            Log.d("sum", ret+"");
         }
+        Log.d("sumAmounts", ret+"");
         return ret;
     }
 
@@ -88,7 +91,7 @@ public class PieChartDrawer extends View {
         int width=getWidth()/2;
         rect=new RectF();
         rect.set(getWidth()/4, 50, width+getWidth()/4, width+50);
-        int total=sumAmounts(valueMap);
+        double total=sumAmounts(valueMap);
         float angleSum=0;
         int count=0;
         double textX;
@@ -104,6 +107,9 @@ public class PieChartDrawer extends View {
             for(String key:valueMap.keySet()){
                 //draw arc using ith paint in the paint array, beginning at angle sum and continuing for 360*percent degrees
                 c.drawArc(rect,angleSum, (float)(360*(valueMap.get(key)/total)), true, paintArr[count]);
+                Log.d("valueMap(key)",""+valueMap.get(key));
+                Log.d("percent", (valueMap.get(key) / total) + "");
+                Log.d("angle", ""+(360*(valueMap.get(key)/total)));
                 //gets theta of center of segment
                 theta=(angleSum+(180*valueMap.get(key)/total))*Math.PI/180;
                 //converts theta to x and y coordinates for label

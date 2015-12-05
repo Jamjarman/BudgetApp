@@ -45,6 +45,7 @@ public class MonthFragment extends Fragment {
     private TableLayout catData;
     private TableLayout expenseTable;
     private TableLayout incomeTable;
+    TableRow tr;
 
     public MonthFragment() {
         // Required empty public constructor
@@ -68,6 +69,7 @@ public class MonthFragment extends Fragment {
         pieChart=(PieChartDrawer)rootView.findViewById(R.id.month_pie_chart);
         expenseTable=(TableLayout)rootView.findViewById(R.id.month_expense_table);
         incomeTable=(TableLayout)rootView.findViewById(R.id.month_income_table);
+        tr=new TableRow(getActivity());
         TableRow income_head=new TableRow(getActivity());
         int i=-9;
         income_head.setId(i + 10);
@@ -166,7 +168,7 @@ public class MonthFragment extends Fragment {
             for(int i=0; i<incomeArr.length(); i++){
                 temp=incomeArr.getJSONObject(i);
                 incomeTotal+=temp.getDouble("amount");
-                TableRow tr=new TableRow(getActivity());
+                tr=new TableRow(getActivity());
                 tr.setId(i+100);
                 tr.setLayoutParams(new TableLayout.LayoutParams(
                         TableLayout.LayoutParams.MATCH_PARENT,
