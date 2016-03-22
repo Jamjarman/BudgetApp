@@ -1,0 +1,30 @@
+{
+  "name": "budgetapp",
+  "version": "1.0.0",
+  "description": "A simple budget app written in node using a mongodb. An accompanying android app adds mobile support.",
+  "main": "budget.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jamjarman/BudgetApp.git"
+  },
+  "keywords": [
+    "Budget",
+    "Android",
+    "Backend"
+  ],
+  "author": "Jamie Gilkeson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Jamjarman/BudgetApp/issues"
+  },
+  "homepage": "https://github.com/Jamjarman/BudgetApp#readme",
+  "dependencies": {
+    "express": "^4.13.4",
+    "express-handlebars": "^3.0.0",
+    "mongoose": "^4.4.8",
+    "mysql": "^2.10.2"
+  }
+}

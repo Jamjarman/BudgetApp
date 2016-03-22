@@ -1,0 +1,93 @@
++------------------+
+| Tables_in_budget |
++------------------+
+| categories       |
+| expense_plan     |
+| expenses         |
+| income_plan      |
+| incomes          |
+| monthly_expenses |
+| monthly_incomes  |
+| users            |
++------------------+
+
+categories
++---------------+---------+------+-----+---------+-------+
+| Field         | Type    | Null | Key | Default | Extra |
++---------------+---------+------+-----+---------+-------+
+| category_id   | int(11) | NO   | PRI | NULL    |       |
+| category_name | text    | NO   |     | NULL    |       |
+| type          | text    | NO   |     | NULL    |       |
++---------------+---------+------+-----+---------+-------+
+
+expenses_plan
++------------+---------+------+-----+---------+-------+
+| Field      | Type    | Null | Key | Default | Extra |
++------------+---------+------+-----+---------+-------+
+| expense_id | int(11) | NO   | PRI | NULL    |       |
+| category   | text    | NO   |     | NULL    |       |
+| amount     | double  | NO   |     | NULL    |       |
+| date       | date    | NO   |     | NULL    |       |
++------------+---------+------+-----+---------+-------+
+
+expenses
++-------------+----------+------+-----+---------+-------+
+| Field       | Type     | Null | Key | Default | Extra |
++-------------+----------+------+-----+---------+-------+
+| expense_id  | int(11)  | NO   | PRI | NULL    |       |
+| category    | text     | NO   |     | NULL    |       |
+| date        | date     | NO   |     | NULL    |       |
+| amount      | double   | NO   |     | NULL    |       |
+| description | longtext | NO   |     | NULL    |       |
++-------------+----------+------+-----+---------+-------+
+
+income_plan
++-----------+---------+------+-----+---------+-------+
+| Field     | Type    | Null | Key | Default | Extra |
++-----------+---------+------+-----+---------+-------+
+| income_id | int(11) | NO   | PRI | NULL    |       |
+| category  | text    | NO   |     | NULL    |       |
+| amount    | double  | NO   |     | NULL    |       |
+| date      | date    | NO   |     | NULL    |       |
++-----------+---------+------+-----+---------+-------+
+
+incomes
++-------------+----------+------+-----+---------+-------+
+| Field       | Type     | Null | Key | Default | Extra |
++-------------+----------+------+-----+---------+-------+
+| income_id   | int(11)  | NO   | PRI | NULL    |       |
+| date        | date     | NO   |     | NULL    |       |
+| amount      | double   | NO   |     | NULL    |       |
+| description | longtext | NO   |     | NULL    |       |
+| category    | text     | NO   |     | NULL    |       |
++-------------+----------+------+-----+---------+-------+
+
+monthly_expenses
++--------------------+----------+------+-----+---------+-------+
+| Field              | Type     | Null | Key | Default | Extra |
++--------------------+----------+------+-----+---------+-------+
+| monthly_expense_id | int(11)  | NO   | PRI | NULL    |       |
+| category           | text     | NO   |     | NULL    |       |
+| amount             | double   | NO   |     | NULL    |       |
+| description        | longtext | NO   |     | NULL    |       |
++--------------------+----------+------+-----+---------+-------+
+
+monthly_incomes
++-------------------+----------+------+-----+---------+-------+
+| Field             | Type     | Null | Key | Default | Extra |
++-------------------+----------+------+-----+---------+-------+
+| monthly_income_id | int(11)  | NO   | PRI | NULL    |       |
+| category          | text     | NO   |     | NULL    |       |
+| amount            | double   | NO   |     | NULL    |       |
+| description       | longtext | NO   |     | NULL    |       |
++-------------------+----------+------+-----+---------+-------+
+
+users
++-------------+---------+------+-----+---------+-------+
+| Field       | Type    | Null | Key | Default | Extra |
++-------------+---------+------+-----+---------+-------+
+| user_id     | int(11) | NO   | PRI | NULL    |       |
+| hashed_pass | text    | NO   |     | NULL    |       |
+| username    | text    | NO   |     | NULL    |       |
++-------------+---------+------+-----+---------+-------+
+
