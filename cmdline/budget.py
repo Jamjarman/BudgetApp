@@ -3,7 +3,9 @@
 import sys, getopt, urllib.request, json, math, serverloc, datetime
 
 #Define all allowed categories
-categories=["Rent/Mortgage", "Home Insurance", "Home Maintenance", "Food", "Electric/Gas/Water", "Internet/Phone", "Car Payment", "Cat Insurance", "Gas/Parking", "Car Maintenance", "Next Car", "Outings", "Vacation Fund", "Electronics", "Games", "Misc. Entertainment", "Snacks", "Health Insurance", "Life Insurance", "Student Loans", "Credit Card Loans", "Other Loans", "Charity", "Savings", "Emergency Fund"]
+categoriesE=["Rent/Mortgage", "Home Insurance", "Home Maintenance", "Food", "Electric/Gas/Water", "Internet/Phone", "Car Payment", "Cat Insurance", "Gas/Parking", "Car Maintenance", "Next Car", "Outings", "Vacation Fund", "Electronics", "Games", "Misc. Entertainment", "Snacks", "Health Insurance", "Life Insurance", "Student Loans", "Credit Card Loans", "Other Loans", "Charity", "Savings", "Emergency Fund"]
+
+categoriesI=["Salary", "Bonus", "Dividends", "Interest", "Gifts", "Other"]
 
 #print out the proper usage
 def usage():
@@ -67,7 +69,11 @@ def lister(sortby, table):
 
 #Add a datapoint to the given table
 def add(table):
+    categories=categoriesE
+    if 'income' in table:
+        categories=categoriesI
     url="http://"+serverloc.serverloc+"/api/"+table
+    print(url)
     print("Adding new item to "+table)
     amount=int(input('Item cost: '))
     description=""
@@ -99,7 +105,6 @@ def add(table):
         responseData=urllib.request.urlopen(urlr).read().decode('utf8', 'ignore')
         responseFail=False
     except urllib.error.HTTPError as e:
-        responseDAta=e.read.decode('utf8', 'ignore')
         responseFail=True
     except urllib.error.URLError:
         responseFail=True
@@ -108,12 +113,17 @@ def add(table):
     
 #update the datapoint with given id in given table
 def update(table, upid):
+    categories=categoriesE
+    if 'income' in table:
+        categories=categoriesI
     url="http://"+serverloc.serverloc+"/api/"+table
     urlRead=url+"?id="+upid
-    print(urlRead)
     response=urllib.request.urlopen(urlRead)
     #Convert the call to json and then get the data element from the json data
     jsonres=json.loads(response.read().decode(response.info().get_param('charset') or 'utf-8'))
+    if(len(jsonres['data'])==0):
+        print("ID not found")
+        sys.exit(2)
     data=jsonres['data'][0]
     print("Leave blank to leave unchanged")
     newAmount=input("Amount ("+str(data['amount'])+"): ")
@@ -143,6 +153,9 @@ def update(table, upid):
     if(table[0]!='m'):
         newDate=input("Date ("+str(data['date'])+"): ")
     details={'id': upid}
+    if(not newAmount and not newDesc and not catFin and not newDate):
+        print("Updating nothing")
+        sys.exit(2)
     if(newAmount):
         details['amount']=newAmount
     if(newDesc):
@@ -161,6 +174,32 @@ def update(table, upid):
 #Delete the datapoint with given id in given table
 def delete(table, delid):
     url="http://"+serverloc.serverloc+"/api/"+table
+    urlRead=url+"?id="+delid
+    response=urllib.request.urlopen(urlRead)
+    #Convert the call to json and then get the data element from the json data
+    jsonres=json.loads(response.read().decode(response.info().get_param('charset') or 'utf-8'))
+    if(len(jsonres['data'])==0):
+        print("ID not found")
+        sys.exit(2)
+    data=jsonres['data'][0]
+    print("You are deleting the following")
+    deletingStr="ID: "+delid+" Amount: "+str(data['amount'])+" Category: "+data['category']
+    if(table[0]!='m'):
+        deletingStr=deletingStr+" Date: "+str(data['date'])
+    if(table[0]!='p'):
+        deletingStr=deletingStr+" Description: "+data['description']
+    print(deletingStr)
+    delete=input("Are you sure you want to delete this (Y/n)")
+    if delete in ('y', 'Y'):
+        details={'id': delid}
+        details=urllib.parse.urlencode(details)
+        details=details.encode('utf8')
+        urlr=urllib.request.Request(url, details)
+        urlr.get_method=lambda: 'DELETE'
+        responseData=urllib.request.urlopen(urlr).read().decode('utf8', 'ignore')
+    else:
+        print("Canceling Delete")
+    
     
 #try to iterate over all args using getopt to split the data into operations and arguments given by the following lists
 try:

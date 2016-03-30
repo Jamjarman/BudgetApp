@@ -359,7 +359,7 @@ app.post('/api/incomes', function(req,res){
 		    res.status(500);
 		    res.render('500');
 		}
-		var id=(row[0]['expense_id'])+1;
+		var id=(row[0]['income_id'])+1;
 		var querystr="INSERT INTO `incomes` (`income_id`, `category`, `date`, `amount`, `description`) VALUES ("+id+", \'"+req.body.category+"\', \'"+req.body.date+"\', "+req.body.amount+", \'"+req.body.description+"\')";
 		connection.query(querystr, function(err, rows, fields){
 		    if(err){
@@ -395,7 +395,7 @@ app.post('/api/monthlyexpenses', function(req,res){
 		    res.status(500);
 		    res.render('500');
 		}
-		var id=(row[0]['expense_id'])+1;
+		var id=(row[0]['monthly_expense_id'])+1;
 		var querystr="INSERT INTO `monthly_expenses` (`monthly_expense_id`, `category`, `amount`, `description`) VALUES ("+id+", \'"+req.body.category+"\', "+req.body.amount+", \'"+req.body.description+"\')";
 		connection.query(querystr, function(err, rows, fields){
 		    if(err){
@@ -431,7 +431,7 @@ app.post('/api/monthlyincomes', function(req,res){
 		    res.status(500);
 		    res.render('500');
 		}
-		var id=(row[0]['expense_id'])+1;
+		var id=(row[0]['monthly_income_id'])+1;
 		var querystr="INSERT INTO `monthly_incomes` (`monthly_income_id`, `category`, `amount`, `description`) VALUES ("+id+", \'"+req.body.category+"\', "+req.body.amount+", \'"+req.body.description+"\')";
 		connection.query(querystr, function(err, rows, fields){
 		    if(err){
@@ -504,7 +504,7 @@ app.post('/api/planincomes', function(req,res){
 		    res.status(500);
 		    res.render('500');
 		}
-		var id=(row[0]['expense_id'])+1;
+		var id=(row[0]['income_id'])+1;
 		var querystr="INSERT INTO `income_plan` (`income_id`, `category`, `date`, `amount`, `description`) VALUES ("+id+", \'"+req.body.category+"\', \'"+req.body.date+"\', "+req.body.amount+", \'"+req.body.description+"\')";
 		connection.query(querystr, function(err, rows, fields){
 		    if(err){
