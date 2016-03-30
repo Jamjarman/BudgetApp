@@ -54,6 +54,12 @@ app.get('/api/expenses', function(req, res){
 		    connectionStr=connectionStr+' and date BETWEEN \''+req.query['datefrom']+'\' AND \''+req.query['dateto']+'\'';
 		}
 	    }
+	    if(req.query['sortby']){
+		connectionStr=connectionStr+" ORDER BY "+req.query['sortby']+" DESC";
+	    }
+	    else{
+		connectionStr=connectionStr+" ORDER BY expense_id DESC";
+	    }
 	    connection.query(connectionStr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
@@ -94,6 +100,12 @@ app.get('/api/incomes', function(req, res){
 		    connectionStr=connectionStr+' and date BETWEEN \''+req.query['datefrom']+'\' AND \''+req.query['dateto']+'\'';
 		}
 	    }
+	    if(req.query['sortby']){
+		connectionStr=connectionStr+" ORDER BY "+req.query['sortby']+" DESC";
+	    }
+	    else{
+		connectionStr=connectionStr+" ORDER BY income_id DESC";
+	    }
 	    connection.query(connectionStr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
@@ -130,6 +142,12 @@ app.get('/api/monthlyexpenses', function(req, res){
 		 if(req.query['category']){
 		     connectionStr=connectionStr+' and category=\''+req.query['category']+'\'';
 		 }
+	    }
+	    if(req.query['sortby']){
+		connectionStr=connectionStr+" ORDER BY "+req.query['sortby']+" DESC";
+	    }
+	    else{
+		connectionStr=connectionStr+" ORDER BY monthly_expense_id DESC";
 	    }
 	    connection.query(connectionStr, function(err, rows, fields){
 		if(err){
@@ -168,6 +186,12 @@ app.get('/api/monthlyincomes', function(req, res){
 		     connectionStr=connectionStr+' and category=\''+req.query['category']+'\'';
 		 }
 	    }
+	    if(req.query['sortby']){
+		connectionStr=connectionStr+" ORDER BY "+req.query['sortby']+" DESC";
+	    }
+	    else{
+		connectionStr=connectionStr+" ORDER BY monthly_income_id DESC";
+	    }
 	    connection.query(connectionStr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
@@ -196,7 +220,7 @@ app.get('/api/planexpenses', function(req, res){
 	    });
 	}
 	else{
-	    var connectionStr='SELECT * FROM `expenses_plan` WHERE 1';
+	    var connectionStr='SELECT * FROM `expense_plan` WHERE 1';
 	    if(req.query['id']){
 		connectionStr=connectionStr+' and expense_id='+req.query['id'];
 	    }
@@ -207,6 +231,12 @@ app.get('/api/planexpenses', function(req, res){
 		if(req.query['datefrom']&&req.query['dateto']){
 		    connectionStr=connectionStr+' and date BETWEEN \''+req.query['datefrom']+'\' AND \''+req.query['dateto']+'\'';
 		}
+	    }
+	    if(req.query['sortby']){
+		connectionStr=connectionStr+" ORDER BY "+req.query['sortby']+" DESC";
+	    }
+	    else{
+		connectionStr=connectionStr+" ORDER BY expense_id DESC";
 	    }
 	    connection.query(connectionStr, function(err, rows, fields){
 		if(err){
@@ -247,6 +277,12 @@ app.get('/api/planincomes', function(req, res){
 		if(req.query['datefrom']&&req.query['dateto']){
 		    connectionStr=connectionStr+' and date BETWEEN \''+req.query['datefrom']+'\' AND \''+req.query['dateto']+'\'';
 		}
+	    }
+	    if(req.query['sortby']){
+		connectionStr=connectionStr+" ORDER BY "+req.query['sortby']+" DESC";
+	    }
+	    else{
+		connectionStr=connectionStr+" ORDER BY income_id DESC";
 	    }
 	    connection.query(connectionStr, function(err, rows, fields){
 		if(err){
@@ -372,7 +408,7 @@ app.post('/api/planexpenses', function(req,res){
 	    });
 	}
 	else{
-	    var querystr="INSERT INTO `expenses_plan` (`expense_id`, `category`, `date`, `amount`) VALUES ("+req.body.id+", "+req.body.category+", "+req.body.date+", "+req.body.amount+")";
+	    var querystr="INSERT INTO `expense_plan` (`expense_id`, `category`, `date`, `amount`) VALUES ("+req.body.id+", "+req.body.category+", "+req.body.date+", "+req.body.amount+")";
 	    connection.query(querystr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
@@ -410,7 +446,7 @@ app.post('/api/planincomes', function(req,res){
 });
 
 //update entries
-app.post('/api/updateexpenses', function(req,res){
+app.put('/api/expenses', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -472,7 +508,7 @@ app.post('/api/updateexpenses', function(req,res){
     });
 });
 
-app.post('/api/updateincomes', function(req,res){
+app.put('/api/incomes', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -534,7 +570,7 @@ app.post('/api/updateincomes', function(req,res){
     });
 });
 
-app.post('/api/updatemonthlyexpenses', function(req,res){
+app.put('/api/monthlyexpenses', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -587,7 +623,7 @@ app.post('/api/updatemonthlyexpenses', function(req,res){
     });
 });
 
-app.post('/api/updatemonthlyincomes', function(req,res){
+app.put('/api/monthlyincomes', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -640,7 +676,7 @@ app.post('/api/updatemonthlyincomes', function(req,res){
     });
 });
 
-app.post('/api/updateplanexpenses', function(req,res){
+app.put('/api/planexpenses', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -651,7 +687,7 @@ app.post('/api/updateplanexpenses', function(req,res){
 	    });
 	}
 	else{
-	    var querystr="UPDATE `expenses_plan` SET";
+	    var querystr="UPDATE `expense_plan` SET";
 	    var first=true;
 	    if(req.body.category){
 		if(first){
@@ -693,7 +729,7 @@ app.post('/api/updateplanexpenses', function(req,res){
     });
 });
 
-app.post('/api/updateplanincomes', function(req,res){
+app.put('/api/planincomes', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -747,7 +783,7 @@ app.post('/api/updateplanincomes', function(req,res){
 });
 
 //delete entries
-app.post('/api/delexpense', function(req,res){
+app.delete('/api/expenses', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -771,7 +807,7 @@ app.post('/api/delexpense', function(req,res){
     });
 });
 
-app.post('/api/delincome', function(req,res){
+app.delete('/api/incomes', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -795,7 +831,7 @@ app.post('/api/delincome', function(req,res){
     });
 });
 
-app.post('/api/delmonthlyexpense', function(req,res){
+app.delete('/api/monthlyexpenses', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -819,7 +855,7 @@ app.post('/api/delmonthlyexpense', function(req,res){
     });
 });
 
-app.post('/api/delmonthlyincomes', function(req,res){
+app.delete('/api/monthlyincomes', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -843,7 +879,7 @@ app.post('/api/delmonthlyincomes', function(req,res){
     });
 });
 
-app.post('/api/delplanexpense', function(req,res){
+app.delete('/api/planexpenses', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
@@ -854,7 +890,7 @@ app.post('/api/delplanexpense', function(req,res){
 	    });
 	}
 	else{
-	    var querystr="DELETE FROM `expenses_plan` WHERE `expense_id`="+req.body.id;
+	    var querystr="DELETE FROM `expense_plan` WHERE `expense_id`="+req.body.id;
 	    connection.query(querystr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
@@ -867,7 +903,7 @@ app.post('/api/delplanexpense', function(req,res){
     });
 });
 
-app.post('/api/delplanincome', function(req,res){
+app.delete('/api/planincomes', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
 	    console.error('CONNECTION error: ', err);
