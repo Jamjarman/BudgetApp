@@ -17,6 +17,10 @@ connectionpool=mysql.createPool({
     password: credentials.database.pass,
     database: 'budget'
 })
+//add body parser to get body for post requests to api
+var bodyParser=require('body-parser');
+app.use(bodyParser.urlencoded());
+//use handlebars for templating
 app.engine('handlebars', handlebars.engine);
 //set public to usable
 app.use(express.static(__dirname + '/public'));
@@ -312,14 +316,26 @@ app.post('/api/expenses', function(req,res){
 	    });
 	}
 	else{
-	    var querystr="INSERT INTO `expenses` (`expense_id`, `category`, `date`, `amount`, `description`) VALUES ("+req.body.id+", "+req.body.category+", "+req.body.date+", "+req.body.amount+", "+req.body.description+")";
-	    connection.query(querystr, function(err, rows, fields){
+	    var idquery="SELECT * FROM `expenses` ORDER BY expense_id DESC LIMIT 1";
+	    connection.query(idquery, function(err, row, fields){
 		if(err){
-		    console.error(err);
+		    console.log(err);
 		    res.status(500);
 		    res.render('500');
 		}
-		connection.release();
+		var id=(row[0]['expense_id'])+1;
+		var querystr="INSERT INTO `expenses` (`expense_id`, `category`, `date`, `amount`, `description`) VALUES ("+id+", \'"+req.body.category+"\', \'"+req.body.date+"\', "+req.body.amount+", \'"+req.body.description+"\')";
+		connection.query(querystr, function(err, rows, fields){
+		    if(err){
+			console.error(err);
+			res.status(500);
+			res.render('500');
+		    }
+		    res.send({
+			success: 'true'
+		    });
+		    connection.release();
+		});
 	    });
 	}
     });
@@ -336,14 +352,26 @@ app.post('/api/incomes', function(req,res){
 	    });
 	}
 	else{
-	    var querystr="INSERT INTO `incomes` (`income_id`, `category`, `date`, `amount`, `description`) VALUES ("+req.body.id+", "+req.body.category+", "+req.body.date+", "+req.body.amount+", "+req.body.description+")";
-	    connection.query(querystr, function(err, rows, fields){
+	    var idquery="SELECT * FROM `incomes` ORDER BY income_id DESC LIMIT 1";
+	    connection.query(idquery, function(err, row, fields){
 		if(err){
-		    console.error(err);
+		    console.log(err);
 		    res.status(500);
 		    res.render('500');
 		}
-		connection.release();
+		var id=(row[0]['expense_id'])+1;
+		var querystr="INSERT INTO `incomes` (`income_id`, `category`, `date`, `amount`, `description`) VALUES ("+id+", \'"+req.body.category+"\', \'"+req.body.date+"\', "+req.body.amount+", \'"+req.body.description+"\')";
+		connection.query(querystr, function(err, rows, fields){
+		    if(err){
+			console.error(err);
+			res.status(500);
+			res.render('500');
+		    }
+		    res.send({
+			success: 'true'
+		    });
+		    connection.release();
+		});
 	    });
 	}
     });
@@ -360,14 +388,26 @@ app.post('/api/monthlyexpenses', function(req,res){
 	    });
 	}
 	else{
-	    var querystr="INSERT INTO `monthly_expenses` (`monthly_expense_id`, `category`, `amount`, `description`) VALUES ("+req.body.id+", "+req.body.category+", "+req.body.amount+", "+req.body.description+")";
-	    connection.query(querystr, function(err, rows, fields){
+	    var idquery="SELECT * FROM `monthly_expenses` ORDER BY monthly_expense_id DESC LIMIT 1";
+	    connection.query(idquery, function(err, row, fields){
 		if(err){
-		    console.error(err);
+		    console.log(err);
 		    res.status(500);
 		    res.render('500');
 		}
-		connection.release();
+		var id=(row[0]['expense_id'])+1;
+		var querystr="INSERT INTO `monthly_expenses` (`monthly_expense_id`, `category`, `amount`, `description`) VALUES ("+id+", \'"+req.body.category+"\', "+req.body.amount+", \'"+req.body.description+"\')";
+		connection.query(querystr, function(err, rows, fields){
+		    if(err){
+			console.error(err);
+			res.status(500);
+			res.render('500');
+		    }
+		    res.send({
+			success: 'true'
+		    });
+		    connection.release();
+		});
 	    });
 	}
     });
@@ -384,18 +424,31 @@ app.post('/api/monthlyincomes', function(req,res){
 	    });
 	}
 	else{
-	    var querystr="INSERT INTO `monthly_incomes` (`monthly_income__id`, `category`, `amount`, `description`) VALUES ("+req.body.id+", "+req.body.category+", "+req.body.amount+", "+req.body.description+")";
-	    connection.query(querystr, function(err, rows, fields){
+	    var idquery="SELECT * FROM `monthly_incomes` ORDER BY monthly_income_id DESC LIMIT 1";
+	    connection.query(idquery, function(err, row, fields){
 		if(err){
-		    console.error(err);
+		    console.log(err);
 		    res.status(500);
 		    res.render('500');
 		}
-		connection.release();
+		var id=(row[0]['expense_id'])+1;
+		var querystr="INSERT INTO `monthly_incomes` (`monthly_income_id`, `category`, `amount`, `description`) VALUES ("+id+", \'"+req.body.category+"\', "+req.body.amount+", \'"+req.body.description+"\')";
+		connection.query(querystr, function(err, rows, fields){
+		    if(err){
+			console.error(err);
+			res.status(500);
+			res.render('500');
+		    }
+		    res.send({
+			success: 'true'
+		    });
+		    connection.release();
+		});
 	    });
 	}
     });
 });
+
 
 app.post('/api/planexpenses', function(req,res){
     connectionpool.getConnection(function(err, connection){
@@ -408,14 +461,26 @@ app.post('/api/planexpenses', function(req,res){
 	    });
 	}
 	else{
-	    var querystr="INSERT INTO `expense_plan` (`expense_id`, `category`, `date`, `amount`) VALUES ("+req.body.id+", "+req.body.category+", "+req.body.date+", "+req.body.amount+")";
-	    connection.query(querystr, function(err, rows, fields){
+	    var idquery="SELECT * FROM `expense_plan` ORDER BY expense_id DESC LIMIT 1";
+	    connection.query(idquery, function(err, row, fields){
 		if(err){
-		    console.error(err);
+		    console.log(err);
 		    res.status(500);
 		    res.render('500');
 		}
-		connection.release();
+		var id=(row[0]['expense_id'])+1;
+		var querystr="INSERT INTO `expense_plan` (`expense_id`, `category`, `date`, `amount`, `description`) VALUES ("+id+", \'"+req.body.category+"\', \'"+req.body.date+"\', "+req.body.amount+", \'"+req.body.description+"\')";
+		connection.query(querystr, function(err, rows, fields){
+		    if(err){
+			console.error(err);
+			res.status(500);
+			res.render('500');
+		    }
+		    res.send({
+			success: 'true'
+		    });
+		    connection.release();
+		});
 	    });
 	}
     });
@@ -432,20 +497,33 @@ app.post('/api/planincomes', function(req,res){
 	    });
 	}
 	else{
-	    var querystr="INSERT INTO `income_plan` (`income_id`, `category`, `date`, `amount`) VALUES ("+req.body.id+", "+req.body.category+", "+req.body.date+", "+req.body.amount+")";
-	    connection.query(querystr, function(err, rows, fields){
+	    var idquery="SELECT * FROM `income_plan` ORDER BY income_id DESC LIMIT 1";
+	    connection.query(idquery, function(err, row, fields){
 		if(err){
-		    console.error(err);
+		    console.log(err);
 		    res.status(500);
 		    res.render('500');
 		}
-		connection.release();
+		var id=(row[0]['expense_id'])+1;
+		var querystr="INSERT INTO `income_plan` (`income_id`, `category`, `date`, `amount`, `description`) VALUES ("+id+", \'"+req.body.category+"\', \'"+req.body.date+"\', "+req.body.amount+", \'"+req.body.description+"\')";
+		connection.query(querystr, function(err, rows, fields){
+		    if(err){
+			console.error(err);
+			res.status(500);
+			res.render('500');
+		    }
+		    res.send({
+			success: 'true'
+		    });
+		    connection.release();
+		});
 	    });
 	}
     });
 });
 
-//update entries
+
+//update entries using put
 app.put('/api/expenses', function(req,res){
     connectionpool.getConnection(function(err, connection){
 	if(err){
@@ -462,19 +540,19 @@ app.put('/api/expenses', function(req,res){
 	    if(req.body.category){
 		if(first){
 		    first=false;
-		    querystr=querystr+" category="+req.body.category;
+		    querystr=querystr+" category=\'"+req.body.category+"\'";
 		}
 		else{
-		    querystr=querystr+", category="+req.body.category;
+		    querystr=querystr+", category=\'"+req.body.category+"\'";
 		}
 	    }
 	    if(req.body.date){
 		if(first){
 		    first=false;
-		    querystr=querystr+" date="+req.body.date;
+		    querystr=querystr+" date=\'"+req.body.date+"\'";
 		}
 		else{
-		    querystr=querystr+", date="+req.body.date;
+		    querystr=querystr+", date=\'"+req.body.date+"\'";
 		}
 	    }
 	    if(req.body.amount){
@@ -489,19 +567,22 @@ app.put('/api/expenses', function(req,res){
 	    if(req.body.description){
 		if(first){
 		    first=false;
-		    querystr=querystr+" description="+req.body.description;
+		    querystr=querystr+" description=\'"+req.body.description+"\'";
 		}
 		else{
-		    querystr=querystr+", description="+req.body.description;
+		    querystr=querystr+", description=\'"+req.body.description+"\'";
 		}
 	    }
-	    querystr=querystr+" WHERE expense_id="+req.query.id;
+	    querystr=querystr+" WHERE expense_id="+req.body.id;
 	    connection.query(querystr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send(
+		    {success: 'true'}
+		);
 		connection.release();
 	    });
 	}
@@ -524,19 +605,19 @@ app.put('/api/incomes', function(req,res){
 	    if(req.body.category){
 		if(first){
 		    first=false;
-		    querystr=querystr+" category="+req.body.category;
+		    querystr=querystr+" category=\'"+req.body.category+"\'";
 		}
 		else{
-		    querystr=querystr+", category="+req.body.category;
+		    querystr=querystr+", category=\'"+req.body.category+"\'";
 		}
 	    }
 	    if(req.body.date){
 		if(first){
 		    first=false;
-		    querystr=querystr+" date="+req.body.date;
+		    querystr=querystr+" date=\'"+req.body.date+"\'";
 		}
 		else{
-		    querystr=querystr+", date="+req.body.date;
+		    querystr=querystr+", date=\'"+req.body.date+"\'";
 		}
 	    }
 	    if(req.body.amount){
@@ -551,19 +632,22 @@ app.put('/api/incomes', function(req,res){
 	    if(req.body.description){
 		if(first){
 		    first=false;
-		    querystr=querystr+" description="+req.body.description;
+		    querystr=querystr+" description=\'"+req.body.description+"\'";
 		}
 		else{
-		    querystr=querystr+", description="+req.body.description;
+		    querystr=querystr+", description=\'"+req.body.description+"\'";
 		}
 	    }
-	    querystr=querystr+" WHERE income_id="+req.query.id;
+	    querystr=querystr+" WHERE income_id="+req.body.id;
 	    connection.query(querystr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    success: 'true'
+		});
 		connection.release();
 	    });
 	}
@@ -586,10 +670,10 @@ app.put('/api/monthlyexpenses', function(req,res){
 	    if(req.body.category){
 		if(first){
 		    first=false;
-		    querystr=querystr+" category="+req.body.category;
+		    querystr=querystr+" category=\'"+req.body.category+"\'";
 		}
 		else{
-		    querystr=querystr+", category="+req.body.category;
+		    querystr=querystr+", category=\'"+req.body.category+"\'";
 		}
 	    }
 	    if(req.body.amount){
@@ -604,19 +688,22 @@ app.put('/api/monthlyexpenses', function(req,res){
 	    if(req.body.description){
 		if(first){
 		    first=false;
-		    querystr=querystr+" description="+req.body.description;
+		    querystr=querystr+" description=\'"+req.body.description+"\'";
 		}
 		else{
-		    querystr=querystr+", description="+req.body.description;
+		    querystr=querystr+", description=\'"+req.body.description+"\'";
 		}
 	    }
-	    querystr=querystr+" WHERE monthly_expense_id="+req.query.id;
+	    querystr=querystr+" WHERE monthly_expense_id="+req.body.id;
 	    connection.query(querystr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    success: 'true'
+		});
 		connection.release();
 	    });
 	}
@@ -639,10 +726,10 @@ app.put('/api/monthlyincomes', function(req,res){
 	    if(req.body.category){
 		if(first){
 		    first=false;
-		    querystr=querystr+" category="+req.body.category;
+		    querystr=querystr+" category=\'"+req.body.category+"\'";
 		}
 		else{
-		    querystr=querystr+", category="+req.body.category;
+		    querystr=querystr+", category=\'"+req.body.category+"\'";
 		}
 	    }
 	    if(req.body.amount){
@@ -657,19 +744,22 @@ app.put('/api/monthlyincomes', function(req,res){
 	    if(req.body.description){
 		if(first){
 		    first=false;
-		    querystr=querystr+" description="+req.body.description;
+		    querystr=querystr+" description=\'"+req.body.description+"\'";
 		}
 		else{
-		    querystr=querystr+", description="+req.body.description;
+		    querystr=querystr+", description=\'"+req.body.description+"\'";
 		}
 	    }
-	    querystr=querystr+" WHERE monthly_income_id="+req.query.id;
+	    querystr=querystr+" WHERE monthly_income_id="+req.body.id;
 	    connection.query(querystr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    success: 'true'
+		});
 		connection.release();
 	    });
 	}
@@ -692,19 +782,19 @@ app.put('/api/planexpenses', function(req,res){
 	    if(req.body.category){
 		if(first){
 		    first=false;
-		    querystr=querystr+" category="+req.body.category;
+		    querystr=querystr+" category=\'"+req.body.category+"\'";
 		}
 		else{
-		    querystr=querystr+", category="+req.body.category;
+		    querystr=querystr+", category=\'"+req.body.category+"\'";
 		}
 	    }
 	    if(req.body.date){
 		if(first){
 		    first=false;
-		    querystr=querystr+" date="+req.body.date;
+		    querystr=querystr+" date=\'"+req.body.date+"\'";
 		}
 		else{
-		    querystr=querystr+", date="+req.body.date;
+		    querystr=querystr+", date=\'"+req.body.date+"\'";
 		}
 	    }
 	    if(req.body.amount){
@@ -716,13 +806,16 @@ app.put('/api/planexpenses', function(req,res){
 		    querystr=querystr+", amount="+req.body.amount;
 		}
 	    }
-	    querystr=querystr+" WHERE expense_id="+req.query.id;
+	    querystr=querystr+" WHERE expense_id="+req.body.id;
 	    connection.query(querystr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    success: 'true'
+		});
 		connection.release();
 	    });
 	}
@@ -745,19 +838,19 @@ app.put('/api/planincomes', function(req,res){
 	    if(req.body.category){
 		if(first){
 		    first=false;
-		    querystr=querystr+" category="+req.body.category;
+		    querystr=querystr+" category=\'"+req.body.category+"\'";
 		}
 		else{
-		    querystr=querystr+", category="+req.body.category;
+		    querystr=querystr+", category=\'"+req.body.category+"\'";
 		}
 	    }
 	    if(req.body.date){
 		if(first){
 		    first=false;
-		    querystr=querystr+" date="+req.body.date;
+		    querystr=querystr+" date=\'"+req.body.date+"\'";
 		}
 		else{
-		    querystr=querystr+", date="+req.body.date;
+		    querystr=querystr+", date=\'"+req.body.date+"\'";
 		}
 	    }
 	    if(req.body.amount){
@@ -769,13 +862,16 @@ app.put('/api/planincomes', function(req,res){
 		    querystr=querystr+", amount="+req.body.amount;
 		}
 	    }
-	    querystr=querystr+" WHERE income_id="+req.query.id;
+	    querystr=querystr+" WHERE income_id="+req.body.id;
 	    connection.query(querystr, function(err, rows, fields){
 		if(err){
 		    console.error(err);
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    success: 'true'
+		});
 		connection.release();
 	    });
 	}
@@ -801,6 +897,9 @@ app.delete('/api/expenses', function(req,res){
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    success: 'true'
+		});
 		connection.release();
 	    });
 	}
@@ -825,6 +924,9 @@ app.delete('/api/incomes', function(req,res){
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    success: 'true'
+		});
 		connection.release();
 	    });
 	}
@@ -849,6 +951,9 @@ app.delete('/api/monthlyexpenses', function(req,res){
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    success: 'true'
+		});
 		connection.release();
 	    });
 	}
@@ -873,6 +978,9 @@ app.delete('/api/monthlyincomes', function(req,res){
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    success: 'true'
+		});
 		connection.release();
 	    });
 	}
@@ -897,6 +1005,9 @@ app.delete('/api/planexpenses', function(req,res){
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    succses: 'true'
+		});
 		connection.release();
 	    });
 	}
@@ -921,6 +1032,9 @@ app.delete('/api/planincomes', function(req,res){
 		    res.status(500);
 		    res.render('500');
 		}
+		res.send({
+		    success: 'true'
+		});
 		connection.release();
 	    });
 	}

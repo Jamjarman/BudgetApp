@@ -7,3 +7,4 @@
 /captures
 node_modules
 credentials.js
+/cmdlin/serverloc.py
