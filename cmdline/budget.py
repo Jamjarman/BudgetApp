@@ -7,6 +7,9 @@ categoriesE=["Rent/Mortgage", "Home Insurance", "Home Maintenance", "Food", "Ele
 
 categoriesI=["Salary", "Bonus", "Dividends", "Interest", "Gifts", "Other"]
 
+#Define days in each month
+daysPerMonth=[31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
 #print out the proper usage
 def usage():
     print("budget is a method for interacting with Jamie's Budget App over the command line")
@@ -19,7 +22,7 @@ def usage():
     print("-t or --table specifies which table should be used (expenses, incomes, monthlyexpenses, monthlyincomes, planexpenses, planincomes) if not specified expenses is assumed")
     print("-s or --sort lists and sorts the output by the passed column (amount, date, category) use l or s")
     print("-p plan this month for the first time or update the current months plan")
-    print("-c compare your months spending to your plan for the month")
+    print("-c compare your months spending to your plan for the month optionally include a date of the form YYYY-mm to show data from previous months")
 
 #return the id name of the given table
 def getID(table):
@@ -266,7 +269,7 @@ def plan():
                 checkstr=""
                 for key in newVals:
                     checkstr+=", "+key+": $"+str(newVals[key])
-                checkstr=checkstr[0:]
+                checkstr=checkstr[2:]
                 print(checkstr)
                 usersatisfied=input("Is this correct? (Y/n)")
                 if usersatisfied in ('y', 'Y'):
@@ -291,7 +294,7 @@ def plan():
             checkstr=""
             for key in newVals:
                 checkstr+=", "+key+": $"+str(newVals[key])
-                checkstr=checkstr[0:]
+                checkstr=checkstr[2:]
             print(checkstr)
             usersatisfied=input("Is this correct? (Y/n)")
             if usersatisfied in ('y', 'Y'):
@@ -304,14 +307,45 @@ def plan():
                     responseData=urllib.request.urlopen(urlr).read().decode('utf8', 'ignore')
                     responseFail=False
 
-                        
-                
-             
-         
+
+#Compare actual spending for given month to planned spending
+def compare(date):
+    url="http://"+serverloc.serverloc+"/api/"
+    if date:
+        startdate=date+"-01"
+        daysinmonth=daysPerMonth[int(date[(len(date)-2):])-1]
+        enddate=date+"-"+str(daysinmonth)
+    else:
+        startdate=datetime.date.today().strftime("%Y-%m-01")
+        enddate=datetime.date.today().strftime("%Y-%m-%d")
+    urlE=url+"expenses?datefrom="+startdate+"&dateto="+enddate
+    urlP=url+"planexpenses?datefrom="+startdate+"&dateto="+enddate
+    responseE=urllib.request.urlopen(urlE)
+    #Convert the call to json and then get the data element from the json data
+    jsonresE=json.loads(responseE.read().decode(responseE.info().get_param('charset') or 'utf-8'))
+    responseP=urllib.request.urlopen(urlP)
+    jsonresP=json.loads(responseP.read().decode(responseP.info().get_param('charset') or 'utf-8'))
+    if(len(jsonresP['data'])==0):
+        print("There is no plan for this month")
+        sys.exit(2)
+    dataP=jsonresP['data']
+    dataE=jsonresE['data']
+    plan={}
+    expenses={}
+    for row in dataP:
+        plan[row['category']]=row['amount']
+        expenses[row['category']]=0
+    for row in dataE:
+        expenses[row['category']]+=row['amount']
+    percentage={}
+    for key in plan:
+        if(plan[key]>0):
+            percentage[key]=int(int(expenses[key])/int(plan[key])*100)
+            print(key+": $"+str(expenses[key])+" spent out of $"+str(plan[key])+": "+str(percentage[key])+"%")
     
 #try to iterate over all args using getopt to split the data into operations and arguments given by the following lists
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hlu:ad:s:t:pc', ["list", "update=", "add", "delete=", "sort=", "table="])
+    opts, args = getopt.getopt(sys.argv[1:], 'hlu:ad:s:t:pc:', ["list", "update=", "add", "delete=", "sort=", "table="])
 except getopt.GetoptError:
     #An error occured, print out proper usage and exit
     usage()
@@ -319,6 +353,7 @@ except getopt.GetoptError:
 
 #Set some variables to prepare for iterating over the arguments
 oneanddone=False
+dateentry=""
 listem=False
 addem=False
 updatem=False
@@ -361,6 +396,7 @@ for opt, arg in opts:
     elif opt in ('-c') and not oneanddone:
         oneanddone=True
         comparem=True
+        dateentry=arg
     elif opt in ('-p') and not oneanddone:
         oneanddone=True
         planem=True
@@ -380,4 +416,5 @@ elif deletem:
 elif planem:
     plan()
 elif comparem:
-    compare()
+    print(dateentry)
+    compare(dateentry)
