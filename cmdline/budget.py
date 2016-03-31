@@ -3,7 +3,7 @@
 import sys, getopt, urllib.request, json, math, serverloc, datetime
 
 #Define all allowed categories
-categoriesE=["Rent/Mortgage", "Home Insurance", "Home Maintenance", "Food", "Electric/Gas/Water", "Internet/Phone", "Car Payment", "Cat Insurance", "Gas/Parking", "Car Maintenance", "Next Car", "Outings", "Vacation Fund", "Electronics", "Games", "Misc. Entertainment", "Snacks", "Health Insurance", "Life Insurance", "Student Loans", "Credit Card Loans", "Other Loans", "Charity", "Savings", "Emergency Fund"]
+categoriesE=["Rent/Mortgage", "Home Insurance", "Home Maintenance", "Food", "Electric/Gas/Water", "Internet/Phone", "Car Payment", "Car Insurance", "Gas/Parking", "Car Maintenance", "Next Car", "Outings", "Vacation Fund", "Clothes", "Sports", "Electronics", "Games", "Misc. Entertainment", "Snacks", "Health Insurance", "Life Insurance", "Student Loans", "Credit Card Loans", "Other Loans", "Charity", "Gits", "Savings", "Emergency Fund"]
 
 categoriesI=["Salary", "Bonus", "Dividends", "Interest", "Gifts", "Other"]
 
@@ -18,6 +18,8 @@ def usage():
     print("-d or --delete deletes an entry specified by passed id")
     print("-t or --table specifies which table should be used (expenses, incomes, monthlyexpenses, monthlyincomes, planexpenses, planincomes) if not specified expenses is assumed")
     print("-s or --sort lists and sorts the output by the passed column (amount, date, category) use l or s")
+    print("-p plan this month for the first time or update the current months plan")
+    print("-c compare your months spending to your plan for the month")
 
 #return the id name of the given table
 def getID(table):
@@ -199,38 +201,152 @@ def delete(table, delid):
         responseData=urllib.request.urlopen(urlr).read().decode('utf8', 'ignore')
     else:
         print("Canceling Delete")
+
+
+#Calculate the total amount from a given dataset
+def sumAmount(data):
+    total=0
+    for row in data:
+        total+=int(row['amount'])
+    return total
+        
+#Given a set of weights for different categories calculate each ones share of total income, return dict of categories and values
+def calcVals(weights):
+    url="http://"+serverloc.serverloc+"/api/"
+    monthlyE=0
+    monthlyI=0
+    responseE=urllib.request.urlopen(url+"monthlyexpenses")
+    #Convert the call to json and then get the data element from the json data
+    jsonresE=json.loads(responseE.read().decode(responseE.info().get_param('charset') or 'utf-8'))
+    data=jsonresE['data']
+    monthlyE=sumAmount(data)
+    responseI=urllib.request.urlopen(url+"monthlyincomes")
+    jsonresI=json.loads(responseI.read().decode(responseI.info().get_param('charset') or 'utf-8'))
+    data=jsonresI['data']
+    monthlyI=sumAmount(data)
+    monthlyDiff=monthlyI-monthlyE
+    totalE=0
+    vals={}
+    for key in weights:
+        totalE+=weights[key]
+    for key in weights:
+        vals[key]=int((weights[key]/totalE)*monthlyDiff)
+    return vals
+
     
+        
+#Plan the coming months expenses, user will be shown all Categories and asked to weight them, assigning weights which will
+#be used to calculate percentages which will be converted to dollar amounts of expected income. These values can be used
+#for comparison purposes
+def plan():
+     url="http://"+serverloc.serverloc+"/api/"
+     #Get the first day of the month to the current date. These will be used to check if the month has been planned already
+     monthstart=datetime.date.today().strftime("%Y-%m-01")
+     monthend=datetime.date.today().strftime("%Y-%m-%d")
+     urlcheckplannedE=url+"planexpenses?datefrom="+monthstart+"&dateto="+monthend
+     responseE=urllib.request.urlopen(urlcheckplannedE)
+     #Convert the call to json and then get the data element from the json data
+     jsonresE=json.loads(responseE.read().decode(responseE.info().get_param('charset') or 'utf-8'))
+     #The month has already been planned
+     if(len(jsonresE['data'])>0):
+         #Does teh user want to update their plan?
+         updatemonth=input("You have alread planned this month, would you like to update the month? (Y/n)")
+         #The user does
+         if updatemonth in ('Y', 'y'):
+             dataE=jsonresE['data']
+             #Iterate over aditional incomes for the month
+             satisfied=False
+             print("Updating planned expenses, please give each category a weight")             
+             while(not satisfied):
+                newWeights={}
+                for rowE in dataE:
+                    updatedVal=int(input("Weight for "+rowE['category']+": "))
+                    newWeights[rowE['category']]=updatedVal
+                newVals=calcVals(newWeights)
+                checkstr=""
+                for key in newVals:
+                    checkstr+=", "+key+": $"+str(newVals[key])
+                checkstr=checkstr[0:]
+                print(checkstr)
+                usersatisfied=input("Is this correct? (Y/n)")
+                if usersatisfied in ('y', 'Y'):
+                    satisfied=True
+                    for row in dataE:
+                        details={'id': row['expense_id'], 'amount': newVals[row['category']]}
+                        details=urllib.parse.urlencode(details)
+                        details=details.encode('utf8')
+                        urlr=urllib.request.Request(url+"planexpenses", details)
+                        urlr.get_method=lambda: 'PUT'
+                        responseData=urllib.request.urlopen(urlr).read().decode('utf8', 'ignore')
+
+     else:
+        satisfied=False
+        print("Updating planned expenses, please give each category a weight")             
+        while(not satisfied):
+            newWeights={}
+            for cat in categoriesE:
+                updatedVal=int(input("Weight for "+cat+": "))
+                newWeights[cat]=updatedVal
+            newVals=calcVals(newWeights)
+            checkstr=""
+            for key in newVals:
+                checkstr+=", "+key+": $"+str(newVals[key])
+                checkstr=checkstr[0:]
+            print(checkstr)
+            usersatisfied=input("Is this correct? (Y/n)")
+            if usersatisfied in ('y', 'Y'):
+                satisfied=True
+                for key in newVals:
+                    details=urllib.parse.urlencode({'category': key, 'amount': newVals[key], 'date': monthstart})
+                    details=details.encode('utf8')
+                    urlr=urllib.request.Request(url+"planexpenses", details)
+                    urlr.add_header("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US) AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.2.149.29 Safari/525.13")
+                    responseData=urllib.request.urlopen(urlr).read().decode('utf8', 'ignore')
+                    responseFail=False
+
+                        
+                
+             
+         
     
 #try to iterate over all args using getopt to split the data into operations and arguments given by the following lists
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hlu:ad:s:t:', ["list", "update=", "add", "delete=", "sort=", "table="])
+    opts, args = getopt.getopt(sys.argv[1:], 'hlu:ad:s:t:pc', ["list", "update=", "add", "delete=", "sort=", "table="])
 except getopt.GetoptError:
     #An error occured, print out proper usage and exit
     usage()
     sys.exit(2)
 
 #Set some variables to prepare for iterating over the arguments
+oneanddone=False
 listem=False
 addem=False
 updatem=False
 updateid=0
 deletem=False
+planem=False
+comparem=False
 deleteid=-1
 sort=""
 table="expenses"
 for opt, arg in opts:
-    if(opt in ('-h')):
+    if(opt in ('-h')) and not oneanddone:
         usage()
+        oneanddone=True
         sys.exit(2)
-    elif opt in ('-a', '--add'):
+    elif opt in ('-a', '--add') and not oneanddone:
+        oneanddone=True
         addem=True
-    elif opt in ('-u', '--update'):
+    elif opt in ('-u', '--update') and not oneanddone:
+        oneanddone=True
         updatem=True
         updateid=arg
-    elif opt in ('-d', '--delete'):
+    elif opt in ('-d', '--delete') and not oneanddone:
+        oneanddone=True
         deletem=True
         deleteid=arg
-    elif opt in ('-l'):
+    elif opt in ('-l') and not oneanddone:
+        oneanddone=True
         listem=True
     elif opt in ('-s', '--sort'):
         if arg in ('date', 'amount', 'category'):
@@ -242,6 +358,12 @@ for opt, arg in opts:
             table=arg
         else:
             print("Table must be one of the following: expenses, incomes, monthlyexpenses, monthlyincomes, planexpenses, planincomes")
+    elif opt in ('-c') and not oneanddone:
+        oneanddone=True
+        comparem=True
+    elif opt in ('-p') and not oneanddone:
+        oneanddone=True
+        planem=True
     else:
         usage()
         sys.exit(2)
@@ -249,9 +371,13 @@ for opt, arg in opts:
 #Do operations listed by arguments
 if listem:
     lister(sort, table)
-if addem:
+elif addem:
     add(table)
-if updatem:
+elif updatem:
     update(table, updateid)
-if deletem:
+elif deletem:
     delete(table, deleteid)
+elif planem:
+    plan()
+elif comparem:
+    compare()
